@@ -1,4 +1,2 @@
 streamlit
-panel
-hvplot
-nbconvert
+matplotlib==3.3.3
