@@ -1,15 +1,21 @@
 from flask_sqlalchemy import SQLAlchemy
 from .views import app
 import logging as lg
+import enum
 
 # Create database connection object
 # Connection de l'application à la base de donnée
 db = SQLAlchemy(app) # modèle pour créer une table
 
+class Gender(enum.Enum):
+    female = 0
+    male = 1
+    other = 2
+
 class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True) # l'iD (1ere colonne) est un entier (integer)
     description = db.Column(db.String(200), nullable=False) # 2eme col
-    gender = db.Column(db.Integer(), nullable=False) # 3eme col
+    gender = db.Column(db.Enum(Gender), nullable=False) # 3eme col
 
     def __init__(self, description, gender):
         self.description = description
