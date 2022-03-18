@@ -122,6 +122,8 @@ if choice == "Général" and data_file is not None:
         # group_labels = ['target == 0', 'target == 1']
         # fig = ff.create_distplot(hist_data, group_labels, bin_size=[2, 2])
         # st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Capacité de remboursement des crédits de la population")
         fig = plt.figure(figsize=(12, 20))
 
         for i, feature in enumerate(['CREDIT_INCOME_PERCENT', 'ANNUITY_INCOME_PERCENT', 'CREDIT_TERM', 'DAYS_EMPLOYED_PERCENT']):
@@ -134,7 +136,7 @@ if choice == "Général" and data_file is not None:
             sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 1, feature], label = 'target == 1')
             # plt.scatter(data.loc[idx][feature])
             # Label the plots
-            plt.title('Distribution of %s by Target Value' % feature)
+            plt.title('Distribution de %s en fonction de la Target' % feature)
             plt.xlabel('%s' % feature); plt.ylabel('Density')
             plt.legend()
 
@@ -256,6 +258,9 @@ elif choice == "Profil Client" and data_file is not None:
         shap.initjs()
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(df)
-        i = df.index[0]
-        shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[i], feature_names=df.columns)
+        i = np.where((df.index.values == idx.values)==True)
+        st.write(df.loc[idx])
+        st.write(shap_values[i])
+        st.write(explainer.expected_value)
+        shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns)
         st.pyplot(fig)
