@@ -11,7 +11,7 @@ st.title('Home Bank')
 st.sidebar.image('logo_bank.jpg')
 
 # variables choisies dans les features importances principales
-ListeVar = [ 
+ListeVar = [
     'EXT_SOURCE_3',
     'EXT_SOURCE_2',
     'EXT_SOURCE_1',
@@ -41,7 +41,7 @@ def get_my_data():
     return X
 
 try:
-    
+
     df_mydata = get_my_data()
 
     st.sidebar.write("# Choix d´un identifiant client")
@@ -50,10 +50,10 @@ try:
     client dans le menu déroulant.**')
 
 
-    client_id = st.sidebar.selectbox( 
+    client_id = st.sidebar.selectbox(
         "", list(df_mydata.index),index=1
     )
-    
+
     st.sidebar.write("# Client id:  ", client_id)
 
 except URLError as e:
@@ -67,12 +67,12 @@ except URLError as e:
     )
 
 
-# url web 
+# url web
 name_url = 'https://app-api-projet-p7.herokuapp.com/api/'+ str(client_id)
 
 # requete et construction du dataframe
 r = requests.get(name_url, timeout=3)
-df = pd.read_json(r.content.decode('utf-8'))
+df = pd.read_json(r.content.decode('utf-8')) #convertit en dictionnaire Python
 
 # IHM
 st.markdown("### Estimation du risque de crédit")
@@ -94,7 +94,7 @@ else:
 
 # info client et probabilité
 st.write("- **Identifiant client**",id_client)
-st.write( 
+st.write(
     "- **Risque estimé: ** ",
      val_defaut," %" )
 
@@ -111,7 +111,7 @@ for feat in ListeVar:
     var = df_mydata.loc[ :, feat ].sort_values()
     var.index = range(len(var))
     plt.scatter(range(len(var)),var)
-    
+
     # Graphique positionnement du client
     var_client = df_mydata.loc[ client_id, feat ]
     idx = var[ var==var_client ].first_valid_index()

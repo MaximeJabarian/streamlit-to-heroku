@@ -11,44 +11,37 @@ import pickle
 app = Flask(__name__)
 
 # route test hello world
+# @app.route("/dashboard/")
 @app.route("/")
 def hello():
-    return "Hello World!"
-
+    return "Bienvenue sur le <i>dashboard</i>"
+    # return render_template("dashboard.html")
 # noms des fichiers
-model = 'RandomForest.pkl'
+model_name = 'RandomForest.pkl'
 fic_data = 'DATA/test_init2.csv'
 
 # chargement du modele
-pickle_in = open(model,'rb')
-classifier = pickle.load(pickle_in)
+pickle_in = open(model_name,'rb')
+model = pickle.load(pickle_in)
 
 # chargement des donnees
-df = pd.read_csv(fic_data)
-# X = df.drop(columns=['TARGET']) 195146
+data = pd.read_csv(fic_data)
 
-# y = df['TARGET']
 
 # calcul du score
 
-# @app.route('/post', methods=["POST"])
-# def testpost():
-#      input_json = request.get_json(force=True)
-#      dictToReturn = {'text':input_json['text']}
-#      return jsonify(dictToReturn)
-
-# @app.route('/api')
-@app.route('/api/<int:post_id>')
-# @app.route('/')
+# @app.route('/api/<int:pp>')
+@app.route('/api')
 def mon_api():
 
-    post_id = int(request.args.get('SK_ID_CURR'))
-    val = classifier.predict_proba(df)
+    idx = request.args.get('SK_ID_CURR')
+    idx = data[data['SK_ID_CURR']==221792].index
+    val = model.predict_proba(data.iloc[idx, 1:])
 
     dictionnaire = {
-        'type': 'Prévision defaut client',
-        'valeurs': [val[post_id].tolist()],
-        'SK_ID_CURR': post_id
+        'type': 'Prevision defaut client',
+        'valeurs': [val[0].tolist()],
+        'SK_ID_CURR': 221792
     }
     return jsonify(dictionnaire)
 
@@ -57,4 +50,4 @@ def mon_api():
 # and not when it is imported in some other file
 if __name__ == "__main__":
 
-    app.run(debug=True) #  Run the Flask application
+    app.run(port=5000, debug=True) #  Run the Flask application

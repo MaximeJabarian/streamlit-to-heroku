@@ -10,7 +10,33 @@ import shap
 
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from bokeh.plotting import figure
+from urllib.error import URLError
 
+
+## entete
+st.sidebar.image('The_World_Bank_logo.png')
+
+## bacground image
+def set_bg_hack_url():
+    '''
+    A function to unpack an image from url and set as bg.
+    Returns
+    -------
+    The background.
+    '''
+
+    st.markdown(
+         f"""
+         <style>
+         .stApp {{
+             background: url("https://mcdn.wallpapersafari.com/medium/53/2/6YM9XE.jpg");
+             background-size: cover
+         }}
+         </style>
+         """,
+         unsafe_allow_html=True
+     )
+set_bg_hack_url()
 
 # message_text = st.text_input("Entrez votre age")
 class open_file:
@@ -194,7 +220,7 @@ elif choice == "Profil Client" and data_file is not None:
         feature_choice = st.sidebar.selectbox("Features",features)
 
         ## Prédiction
-        models = ["Regression_Logisitique.pkl","RandomForest.pkl", "XGBOOST.pkl"]
+        models = ["RandomForest.pkl", "XGBOOST.pkl", "Regression_Logisitique.pkl"]
         model_choice = st.sidebar.selectbox("Modèle",models)
         model = pickle.load(open(model_choice, 'rb'))
         df_client = pd.DataFrame(df.loc[idx].values.reshape(1, len(df.columns)), columns=df.columns)
