@@ -30,7 +30,7 @@ data = pd.read_csv(fic_data)
 
 # calcul du score
 
-# @app.route('/api/<int:pp>')
+# @app.route('/api/<int:idx>')
 @app.route('/api')
 def mon_api():
 
@@ -41,7 +41,7 @@ def mon_api():
     dictionnaire = {
         'type': 'Prevision defaut client',
         'valeurs': [val[0].tolist()],
-        'SK_ID_CURR': 221792
+        'ID client': 221792
     }
     return jsonify(dictionnaire)
 

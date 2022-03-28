@@ -7,36 +7,32 @@ import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import seaborn as sns
 import shap
+import requests
 
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from bokeh.plotting import figure
 from urllib.error import URLError
+from streamlit_shap import st_shap
 
 
 ## entete
 st.sidebar.image('The_World_Bank_logo.png')
 
 ## bacground image
-def set_bg_hack_url():
-    '''
-    A function to unpack an image from url and set as bg.
-    Returns
-    -------
-    The background.
-    '''
-
-    st.markdown(
-         f"""
-         <style>
-         .stApp {{
-             background: url("https://mcdn.wallpapersafari.com/medium/53/2/6YM9XE.jpg");
-             background-size: cover
-         }}
-         </style>
-         """,
-         unsafe_allow_html=True
-     )
-set_bg_hack_url()
+# def set_bg_hack_url():
+#
+#     st.markdown(
+#          f"""
+#          <style>
+#          .stApp {{
+#              background: url("https://mcdn.wallpapersafari.com/medium/53/2/6YM9XE.jpg");
+#              background-size: cover
+#          }}
+#          </style>
+#          """,
+#          unsafe_allow_html=True
+#      )
+# set_bg_hack_url()
 
 # message_text = st.text_input("Entrez votre age")
 class open_file:
@@ -87,6 +83,14 @@ def classify_people(model, data, idx):
 
   return(data_res)
 
+
+# ## url web
+# name_url = 'https://git.heroku.com/credit-validation-app.git/api/' #+ str(SK_ID_CURR)
+#
+# ## requete et construction du dataframe
+# r = requests.get(name_url, timeout=3)
+# data_file = pd.read_json(r.content.decode('utf-8')) #lit le dictionnaire json
+
 ## Titre app
 st.title("Demande de crédit")
 menu = ["Général", "Profil Client"]
@@ -132,24 +136,8 @@ if data_file is not None:
 
 if choice == "Général" and data_file is not None:
 
-        ################# Plots généraux version st
-        # ## Courbe
-        # st.line_chart(data['AMT_INCOME_TOTAL'])
-        # ## Histo
-        # st.bar_chart(data[['AMT_CREDIT', 'AMT_INCOME_TOTAL']])
-        # ## Courbe
-        # p = figure(title='simple line example', x_axis_label='x', y_axis_label='y')
-        # p.line(data['AMT_CREDIT'], data['AMT_ANNUITY'], legend_label='Trend', line_width=2)
-        # st.bokeh_chart(p, use_container_width=True)
 
-        ## Distribution de l'age en fonction des classes
-        # hist_data = [data_app_train.loc[data_app_train['TARGET'] == 0, 'DAYS_BIRTH'] / 365,
-        # data_app_train.loc[data_app_train['TARGET'] == 1, 'DAYS_BIRTH'] / 365]
-        # group_labels = ['target == 0', 'target == 1']
-        # fig = ff.create_distplot(hist_data, group_labels, bin_size=[2, 2])
-        # st.plotly_chart(fig, use_container_width=True)
-
-        st.subheader("Capacité de remboursement des crédits de la population")
+        st.subheader("Capacité de remboursement de crédit de la population")
         fig = plt.figure(figsize=(12, 20))
 
         for i, feature in enumerate(['CREDIT_INCOME_PERCENT', 'ANNUITY_INCOME_PERCENT', 'CREDIT_TERM', 'DAYS_EMPLOYED_PERCENT']):
@@ -168,32 +156,6 @@ if choice == "Général" and data_file is not None:
 
         plt.tight_layout(h_pad = 2.5)
         st.pyplot(fig)
-        # fig = plt.figure(figsize=(10, 4))
-        #
-        # plt.subplot(1, 2, 1)
-        # plt.scatter(data['AMT_CREDIT'], data['AMT_INCOME_TOTAL'])
-        # plt.scatter(data.loc[idx]['AMT_CREDIT'], data.loc[idx]['AMT_INCOME_TOTAL'])
-        #
-        # # fig = plt.figure(figsize = (10, 5))
-        # plt.subplot(1, 2, 2)
-        # plt.bar(data['AMT_CREDIT'], data['AMT_INCOME_TOTAL'])
-        # plt.xlabel("Programming Environment")
-        # plt.ylabel("Number of Students")
-        # plt.title("Students enrolled in different courses")
-        # st.pyplot(fig)
-
-        # plt.pie(data['AMT_INCOME_TOTAL'], labels = mylabels)
-        # st.pyplot(fig)
-
-
-        # X1 = data_app_train.loc[data_app_train['TARGET'] == 0, 'CREDIT_INCOME_PERCENT']
-        # X2 = data_app_train.loc[data_app_train['TARGET'] == 1, 'CREDIT_INCOME_PERCENT']
-        # p = figure(title='simple line example', x_axis_label='x', y_axis_label='y')
-        # XX1 = np.linspace(1, len(X1), len(X1))
-        # XX2 = np.linspace(1, len(X2), len(X2))
-        # p.line(XX1, X1, legend_label='Trend', line_width=2)
-        # p.line(XX2, X2, legend_label='Trend', line_width=2)
-        # st.bokeh_chart(p, use_container_width=True)
 
         ############### Plots classiques
         # Distribution de l'age en fonction des remboursements des crédits
@@ -280,13 +242,28 @@ elif choice == "Profil Client" and data_file is not None:
         plt.legend()
         st.pyplot(fig)
 
-        fig = plt.figure(figsize=(10, 4))
-        shap.initjs()
-        explainer = shap.TreeExplainer(model)
-        shap_values = explainer.shap_values(df)
-        i = np.where((df.index.values == idx.values)==True)
-        st.write(df.loc[idx])
-        st.write(shap_values[i])
-        st.write(explainer.expected_value)
-        shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns)
-        st.pyplot(fig)
+        # if model_choice == "RandomForest.pkl" or model_choice == "XGBOOST.pkl":
+
+            ## Shaply model
+
+            # def st_shap(plot, height=None):
+            #     shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
+            #     components.html(shap_html, height=height)
+
+
+            ## compute SHAP values
+            # explainer = shap.Explainer(model, df)
+            # shap_values = explainer(df)
+            # st_shap(shap.plots.waterfall(shap_values[0]), height=300)
+            # st_shap(shap.plots.beeswarm(shap_values), height=300)
+            # fig = plt.figure(figsize=(10, 4))
+            # shap.initjs()
+            # explainer = shap.TreeExplainer(model)
+            # shap_values = explainer.shap_values(df)
+            # i = np.where((df.index.values == idx.values)==True)
+            # st.write(df.loc[idx])
+            # st.write(shap_values[i])
+            # st.write(explainer.expected_value)
+            # shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns)
+            # st_shap(shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns))
+            # st.pyplot(fig)
