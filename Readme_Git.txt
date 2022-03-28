@@ -1,7 +1,7 @@
-Lignes de commande pour pusher sur GitHub:
+LIGNES DE COMMANDE POUR PUSHER SUR GITHUB:
 
-Se connecter sur GitHub via SSH une première fois (et non pas https)
-Or create a new repository on the command line
+SE CONNECTER SUR GITHUB VIA SSH UNE PREMIÈRE FOIS (ET NON PAS HTTPS)
+OR CREATE A NEW REPOSITORY ON THE COMMAND LINE
 echo "# Openclassrooms2" >> README.md
 git init
 git add README.md
@@ -11,13 +11,13 @@ git remote add origin git@github.com:MaximeJabarian/Openclassrooms2.git
 git push -u origin main
 
 
-Or push an existing repository from the command line
+OR PUSH AN EXISTING REPOSITORY FROM THE COMMAND LINE
 git remote add origin git@github.com:MaximeJabarian/Openclassrooms2.git
 git branch -M main
 git push -u origin main
 
 
-Pour exclure certains dossiers/fichiers du push, il faut créer un fichier .gitignore dans le dossier racine:
+POUR EXCLURE CERTAINS DOSSIERS/FICHIERS DU PUSH, IL FAUT CRÉER UN FICHIER .GITIGNORE DANS LE DOSSIER RACINE:
 touch .gitignore
 vi .gitignore ( écrire le nom des dossiers/fichiers à exclure )
 
