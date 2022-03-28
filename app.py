@@ -17,8 +17,8 @@ def hello():
     return "Bienvenue sur le <i>dashboard</i>"
     # return render_template("dashboard.html")
 # noms des fichiers
-model_name = 'RandomForest.pkl'
-fic_data = 'DATA/test_init2.csv'
+model_name = '../RandomForest.pkl'
+fic_data = '../DATA/test_init2.csv'
 
 # chargement du modele
 pickle_in = open(model_name,'rb')

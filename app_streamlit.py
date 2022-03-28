@@ -18,23 +18,22 @@ from streamlit_shap import st_shap
 ## entete
 st.sidebar.image('The_World_Bank_logo.png')
 
-## bacground image
-# def set_bg_hack_url():
-#
-#     st.markdown(
-#          f"""
-#          <style>
-#          .stApp {{
-#              background: url("https://mcdn.wallpapersafari.com/medium/53/2/6YM9XE.jpg");
-#              background-size: cover
-#          }}
-#          </style>
-#          """,
-#          unsafe_allow_html=True
-#      )
-# set_bg_hack_url()
+# bacground image
+def set_bg_hack_url():
 
-# message_text = st.text_input("Entrez votre age")
+    st.markdown(
+         f"""
+         <style>
+         .stApp {{
+             background: url("https://mcdn.wallpapersafari.com/medium/53/2/6YM9XE.jpg");
+             background-size: cover
+         }}
+         </style>
+         """,
+         unsafe_allow_html=True
+     )
+set_bg_hack_url()
+
 class open_file:
     def file_selector(self):
        file = st.sidebar.file_uploader("Choisir un ficher CSV", type="csv")
