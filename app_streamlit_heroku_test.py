@@ -92,8 +92,8 @@ def classify_people(model, data, idx):
 
 ## Titre app
 st.title("Demande de crédit")
-# menu = ["Général", "Profil Client"]
-# choice = st.sidebar.selectbox("Menu",menu)
+menu = ["Général", "Profil Client"]
+choice = st.sidebar.selectbox("Menu",menu)
 # data_file = st.file_uploader("Veuillez télécharger un ficher CSV",type=["csv"])
 #
 # if data_file is not None:
