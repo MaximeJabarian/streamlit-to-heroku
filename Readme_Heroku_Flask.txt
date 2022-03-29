@@ -12,6 +12,8 @@ I) Heroku cherche deux documents qu'il faut d'abord créer:
 	2° requirements.txt : liste les librairies à installer.
 
 II) heroku login
-	1° heroku create credit-validation-app
-	2° git push heroku main
+	1° heroku create credit-validation-api
+	2° git push heroku main > création du lien web sur heroku
+	3° coller le lien_heroku dans Chrome
+	4° Si erreur d'affichage: heroku logs --app credit-validation-api
 
