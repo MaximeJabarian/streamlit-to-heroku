@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import seaborn as sns
-import shap
+# import shap
 import requests
 
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-from bokeh.plotting import figure
-from urllib.error import URLError
-from streamlit_shap import st_shap
+# from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+# from bokeh.plotting import figure
+# from urllib.error import URLError
+# from streamlit_shap import st_shap
 
 
 # ## entete
