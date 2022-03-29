@@ -149,9 +149,9 @@ if choice == "Général" and data_file is not None:
             plt.title('Distribution de %s en fonction de la Target' % feature)
             plt.xlabel('%s' % feature); plt.ylabel('Density')
             plt.legend()
-#
-#         plt.tight_layout(h_pad = 2.5)
-#         st.pyplot(fig)
+
+        plt.tight_layout(h_pad = 2.5)
+        st.pyplot(fig)
 #
 #         ############### Plots classiques
 #         # Distribution de l'age en fonction des remboursements des crédits
