@@ -94,64 +94,61 @@ def classify_people(model, data, idx):
 st.title("Demande de crédit")
 menu = ["Général", "Profil Client"]
 choice = st.sidebar.selectbox("Menu",menu)
-# data_file = st.file_uploader("Veuillez télécharger un ficher CSV",type=["csv"])
-#
-# if data_file is not None:
-#
-#     df = pd.read_csv(data_file, sep=';')
-#     df = df.set_index('Unnamed: 0')
-#     df_cols = df.columns
-#     clients_ids = df['SK_ID_CURR'].astype(int)
-#     df_original = df.copy()
-#
-# if data_file is not None:
-#
-#     df = df.sample(frac=1) # frac=1 : shuffe 100%
-#     np.random.seed(seed=3)
-#     size = np.random.rand(len(df)) < 0.8
-#     train_init = df[size]
-#     test_init = df[~size]
-#     y_train_init = train_init.iloc[:,-1]
-#     y_test_init = test_init.iloc[:,-1]
-#     df = test_init.iloc[:,:-1]
-#     df_idx = df.index
-#     df['SK_ID_CURR'] = clients_ids.astype(int)
-#     df = df.dropna()
-#
-#
-#     ## Dataset_init: Population d'entrainement
-#     data_app_train = df_original.copy()
-#     data_app_train = pd.get_dummies(data_app_train)
-#     data_app_train['DAYS_BIRTH'] = abs(data_app_train['DAYS_BIRTH'])
-#
-#
-#     ## Distribution de CREDIT_INCOME_PERCENT
-#     data_app_train['CREDIT_INCOME_PERCENT'] = data_app_train['AMT_CREDIT'] / data_app_train['AMT_INCOME_TOTAL']
-#     data_app_train['ANNUITY_INCOME_PERCENT'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_INCOME_TOTAL']
-#     data_app_train['CREDIT_TERM'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_CREDIT']
-#     data_app_train['DAYS_EMPLOYED_PERCENT'] = data_app_train['DAYS_EMPLOYED'] / data_app_train['DAYS_BIRTH']
-#
-#
-#
-# if choice == "Général" and data_file is not None:
-#
-#
-#         st.subheader("Capacité de remboursement de crédit de la population")
-#         fig = plt.figure(figsize=(12, 20))
-#
-#         for i, feature in enumerate(['CREDIT_INCOME_PERCENT', 'ANNUITY_INCOME_PERCENT', 'CREDIT_TERM', 'DAYS_EMPLOYED_PERCENT']):
-#
-#             # create a new subplot for each source
-#             plt.subplot(4, 1, i + 1)
-#             # plot repaid loans
-#             sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 0, feature], label = 'target == 0')
-#             # plot loans that were not repaid
-#             sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 1, feature], label = 'target == 1')
-#             # plt.scatter(data.loc[idx][feature])
-#             # Label the plots
-#             plt.title('Distribution de %s en fonction de la Target' % feature)
-#             plt.xlabel('%s' % feature); plt.ylabel('Density')
-#             plt.legend()
+data_file = st.file_uploader("Veuillez télécharger un ficher CSV",type=["csv"])
+
+if data_file is not None:
+
+    df = pd.read_csv(data_file, sep=';')
+    df = df.set_index('Unnamed: 0')
+    df_cols = df.columns
+    clients_ids = df['SK_ID_CURR'].astype(int)
+    df_original = df.copy()
+    df = df.sample(frac=1) # frac=1 : shuffe 100%
+    np.random.seed(seed=3)
+    size = np.random.rand(len(df)) < 0.8
+    train_init = df[size]
+    test_init = df[~size]
+    y_train_init = train_init.iloc[:,-1]
+    y_test_init = test_init.iloc[:,-1]
+    df = test_init.iloc[:,:-1]
+    df_idx = df.index
+    df['SK_ID_CURR'] = clients_ids.astype(int)
+    df = df.dropna()
+
+
+    ## Dataset_init: Population d'entrainement
+    data_app_train = df_original.copy()
+    data_app_train = pd.get_dummies(data_app_train)
+    data_app_train['DAYS_BIRTH'] = abs(data_app_train['DAYS_BIRTH'])
+
+
+    ## Distribution de CREDIT_INCOME_PERCENT
+    data_app_train['CREDIT_INCOME_PERCENT'] = data_app_train['AMT_CREDIT'] / data_app_train['AMT_INCOME_TOTAL']
+    data_app_train['ANNUITY_INCOME_PERCENT'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_INCOME_TOTAL']
+    data_app_train['CREDIT_TERM'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_CREDIT']
+    data_app_train['DAYS_EMPLOYED_PERCENT'] = data_app_train['DAYS_EMPLOYED'] / data_app_train['DAYS_BIRTH']
+
+
+
+if choice == "Général" and data_file is not None:
+
+
+        st.subheader("Capacité de remboursement de crédit de la population")
+        fig = plt.figure(figsize=(12, 20))
+
+        for i, feature in enumerate(['CREDIT_INCOME_PERCENT', 'ANNUITY_INCOME_PERCENT', 'CREDIT_TERM', 'DAYS_EMPLOYED_PERCENT']):
+
+            # create a new subplot for each source
+            plt.subplot(4, 1, i + 1)
+            # plot repaid loans
+            sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 0, feature], label = 'target == 0')
+            # plot loans that were not repaid
+            sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 1, feature], label = 'target == 1')
+            # plt.scatter(data.loc[idx][feature])
+            # Label the plots
+            plt.title('Distribution de %s en fonction de la Target' % feature)
+            plt.xlabel('%s' % feature); plt.ylabel('Density')
+            plt.legend()
 #
 #         plt.tight_layout(h_pad = 2.5)
 #         st.pyplot(fig)
