@@ -187,6 +187,12 @@ elif choice == "Profil Client" and data_file is not None:
         df_client = pd.DataFrame(df.loc[idx].values.reshape(1, len(df.columns)), columns=df.columns)
         results = classify_people(model, df_client, idx)
 
+        ### Les + proches voisins d'un client
+        distances = np.linalg.norm(df - df_client, axis=1)
+        k = 3
+        idx_nearest_neighbor = distances.argsort()[:k]
+        # nearest_neighbor_ids = df.iloc[idx_nearest_neighbor]['SK_ID_CURR']
+
         st.subheader("Crédit accordé au client: \n")
 
         if results['TARGET_probability'][0] < 0.45:
@@ -228,19 +234,20 @@ elif choice == "Profil Client" and data_file is not None:
         st.plotly_chart(fig)
         st.subheader("Probabilité de remboursement du client: %.1f%%"%(results['TARGET_probability'][0]*1e2))
 
+
         fig = plt.figure(figsize=(10, 4))
 
         idx_target1 = data_app_train[data_app_train['TARGET']==0].index
         idx_target2 = data_app_train[data_app_train['TARGET']==1].index
-        plt.scatter(abs(data_app_train.loc[idx_target1, 'DAYS_BIRTH']/365),
-         data_app_train.loc[idx_target1, feature_choice], label='TARGET = 0')
-        plt.scatter(abs(data_app_train.loc[idx_target2, 'DAYS_BIRTH']/365),
-         data_app_train.loc[idx_target2, feature_choice], label='TARGET = 1')
-        plt.scatter(abs(data_app_train.loc[idx, 'DAYS_BIRTH']/365),
-        data_app_train.loc[idx, feature_choice], color='k', label='Client ID:%d'%int(idx.values))
+        plt.scatter(abs(data_app_train.loc[idx_target1, 'DAYS_BIRTH']/365), data_app_train.loc[idx_target1, feature_choice], label='TARGET = 0')
+        plt.scatter(abs(data_app_train.loc[idx_target2, 'DAYS_BIRTH']/365), data_app_train.loc[idx_target2, feature_choice], label='TARGET = 1')
+        plt.scatter(abs(data_app_train.loc[idx, 'DAYS_BIRTH']/365), data_app_train.loc[idx, feature_choice], color='k', label='Client ID:%d'%int(idx.values))
+        plt.scatter(abs(data_app_train.iloc[idx_nearest_neighbor]['DAYS_BIRTH']/365), data_app_train.iloc[idx_nearest_neighbor][feature_choice], color='m',
+        label='Clients avec un profil similaire')
         plt.legend()
         st.pyplot(fig)
 
+        st.write(df_client, idx_nearest_neighbor)
         # if model_choice == "RandomForest.pkl" or model_choice == "XGBOOST.pkl":
 
             ## Shaply model

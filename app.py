@@ -17,8 +17,8 @@ def hello():
     return "Bienvenue sur le <i>dashboard</i>"
     # return render_template("dashboard.html")
 # noms des fichiers
-model_name = '../RandomForest.pkl'
-fic_data = '../DATA/test_init2.csv'
+model_name = 'RandomForest.pkl'
+fic_data = 'DATA/test_init2.csv'
 
 # chargement du modele
 pickle_in = open(model_name,'rb')
@@ -30,8 +30,8 @@ data = pd.read_csv(fic_data)
 
 # calcul du score
 
-# @app.route('/api/<int:idx>')
-@app.route('/api')
+@app.route('/api/<int:idx>')
+# @app.route('/api')
 def mon_api():
 
     idx = request.args.get('SK_ID_CURR')

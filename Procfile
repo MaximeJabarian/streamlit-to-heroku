@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run app_streamlit_heroku_test.py
+web: gunicorn app:app --timeout 10
