@@ -8,6 +8,7 @@ import plotly.figure_factory as ff
 import seaborn as sns
 import shap
 import requests
+import os
 
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from bokeh.plotting import figure
@@ -89,13 +90,14 @@ def classify_people(model, data, idx):
 
   return(data_res)
 
+# ## url web
+API_URL = os.getenv("API_URL", "https://credit-validation-api.herokuapp.com/")
 
-## url web
-name_url = 'https://credit-validation-api.herokuapp.com/' #+ str(SK_ID_CURR)
-
-## requete et construction du dataframe
-r = requests.get(name_url, timeout=3)
-data_file = pd.read_json(r.content.decode('utf-8')) #lit le dictionnaire json
+# name_url = 'https://credit-validation-api.herokuapp.com/' #+ str(SK_ID_CURR)
+#
+# ## requete et construction du dataframe
+# r = requests.get(name_url, timeout=3)
+# data_file = pd.read_json(r.content.decode('utf-8')) #lit le dictionnaire json
 
 ## Titre app
 st.title("Demande de crédit")

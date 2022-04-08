@@ -30,19 +30,19 @@ data = pd.read_csv(fic_data)
 
 # calcul du score
 
-# @app.route('/api/<int:idx>')
-@app.route('/api')
-def mon_api():
+# @app.route('/api')
+@app.route('/api/<int:SK_ID_CURR>')
+def mon_api(SK_ID_CURR):
 
-    SK_ID = request.args.get('SK_ID_CURR')
-    idx = data[data['SK_ID_CURR']==221792].index
+    # SK_ID = request.args.get('SK_ID_CURR') 221792
+    idx = data[data['SK_ID_CURR']==SK_ID_CURR].index
     val = model.predict_proba(data.iloc[idx, 1:])
 
     dictionnaire = {
         'type': 'Prevision defaut client',
         'valeurs': [val[0].tolist()],
-        'ID client': 221792,
-        'SK_ID': SK_ID
+        # 'ID client': idx,
+        'SK_ID_CURR': SK_ID_CURR
     }
     return jsonify(dictionnaire)
 
