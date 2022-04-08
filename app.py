@@ -30,18 +30,19 @@ data = pd.read_csv(fic_data)
 
 # calcul du score
 
-@app.route('/api/<int:idx>')
-# @app.route('/api')
+# @app.route('/api/<int:idx>')
+@app.route('/api')
 def mon_api():
 
-    idx = request.args.get('SK_ID_CURR')
+    SK_ID = request.args.get('SK_ID_CURR')
     idx = data[data['SK_ID_CURR']==221792].index
     val = model.predict_proba(data.iloc[idx, 1:])
 
     dictionnaire = {
         'type': 'Prevision defaut client',
         'valeurs': [val[0].tolist()],
-        'ID client': 221792
+        'ID client': 221792,
+        'SK_ID': SK_ID
     }
     return jsonify(dictionnaire)
 
@@ -50,4 +51,4 @@ def mon_api():
 # and not when it is imported in some other file
 if __name__ == "__main__":
 
-    app.run(port=5000, debug=True) #  Run the Flask application
+    app.run(debug=True) #port=5000, debug=True) #  Run the Flask application

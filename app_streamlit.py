@@ -15,6 +15,13 @@ from urllib.error import URLError
 from streamlit_shap import st_shap
 
 
+def fetch(session, url):
+    try:
+        result = session.get(url)
+        return result.json()
+    except Exception:
+        return {}
+
 ## entete
 st.sidebar.image('The_World_Bank_logo.png')
 
@@ -83,12 +90,12 @@ def classify_people(model, data, idx):
   return(data_res)
 
 
-# ## url web
-# name_url = 'https://git.heroku.com/credit-validation-app.git/api/' #+ str(SK_ID_CURR)
-#
-# ## requete et construction du dataframe
-# r = requests.get(name_url, timeout=3)
-# data_file = pd.read_json(r.content.decode('utf-8')) #lit le dictionnaire json
+## url web
+name_url = 'https://credit-validation-api.herokuapp.com/' #+ str(SK_ID_CURR)
+
+## requete et construction du dataframe
+r = requests.get(name_url, timeout=3)
+data_file = pd.read_json(r.content.decode('utf-8')) #lit le dictionnaire json
 
 ## Titre app
 st.title("Demande de crédit")
@@ -188,8 +195,8 @@ elif choice == "Profil Client" and data_file is not None:
         results = classify_people(model, df_client, idx)
 
         ### Les + proches voisins d'un client
-        distances = np.linalg.norm(df - df_client, axis=1)
-        k = 3
+        distances = np.linalg.norm(df.values - df_client.values, axis=1)
+        k = 20
         idx_nearest_neighbor = distances.argsort()[:k]
         # nearest_neighbor_ids = df.iloc[idx_nearest_neighbor]['SK_ID_CURR']
 
@@ -247,7 +254,6 @@ elif choice == "Profil Client" and data_file is not None:
         plt.legend()
         st.pyplot(fig)
 
-        st.write(df_client, idx_nearest_neighbor)
         # if model_choice == "RandomForest.pkl" or model_choice == "XGBOOST.pkl":
 
             ## Shaply model
