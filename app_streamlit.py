@@ -103,69 +103,56 @@ API_URL = os.getenv("API_URL", "https://credit-validation-api.herokuapp.com/")
 st.title("Demande de crédit")
 menu = ["Général", "Profil Client"]
 choice = st.sidebar.selectbox("Menu",menu)
-data_file = st.file_uploader("Veuillez télécharger un ficher CSV",type=["csv"])
-
-if data_file is not None:
-
-    df = pd.read_csv(data_file, sep=';')
-    df = df.set_index('Unnamed: 0')
-    df_cols = df.columns
-    clients_ids = df['SK_ID_CURR'].astype(int)
-    df_original = df.copy()
-
-if data_file is not None:
-
-    df = df.sample(frac=1) # frac=1 : shuffe 100%
-    np.random.seed(seed=3)
-    size = np.random.rand(len(df)) < 0.8
-    train_init = df[size]
-    test_init = df[~size]
-    y_train_init = train_init.iloc[:,-1]
-    y_test_init = test_init.iloc[:,-1]
-    df = test_init.iloc[:,:-1]
-    df_idx = df.index
-    df['SK_ID_CURR'] = clients_ids.astype(int)
-    df = df.dropna()
 
 
-    ## Dataset_init: Population d'entrainement
-    data_app_train = df_original.copy()
-    data_app_train = pd.get_dummies(data_app_train)
-    data_app_train['DAYS_BIRTH'] = abs(data_app_train['DAYS_BIRTH'])
+df = pd.read_csv('train_init3.csv', sep=';').drop(columns=['Unnamed: 0'])
+# df = df.set_index('Unnamed: 0')
+df_cols = df.columns
+clients_ids = df['SK_ID_CURR'].astype(int)
+df_original = df.copy()
+
+df = df.sample(frac=1) # frac=1 : shuffe 100%
+np.random.seed(seed=3)
+size = np.random.rand(len(df)) < 0.8
+train_init = df[size]
+test_init = df[~size]
+y_train_init = train_init.iloc[:,-1]
+y_test_init = test_init.iloc[:,-1]
+df = test_init.iloc[:,:-1]
+df_idx = df.index
+df['SK_ID_CURR'] = clients_ids.astype(int)
+df = df.dropna()
 
 
-    ## Distribution de CREDIT_INCOME_PERCENT
-    data_app_train['CREDIT_INCOME_PERCENT'] = data_app_train['AMT_CREDIT'] / data_app_train['AMT_INCOME_TOTAL']
-    data_app_train['ANNUITY_INCOME_PERCENT'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_INCOME_TOTAL']
-    data_app_train['CREDIT_TERM'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_CREDIT']
-    data_app_train['DAYS_EMPLOYED_PERCENT'] = data_app_train['DAYS_EMPLOYED'] / data_app_train['DAYS_BIRTH']
+## Dataset_init: Population d'entrainement
+data_app_train = df_original.copy()
+data_app_train = pd.get_dummies(data_app_train)
+data_app_train['DAYS_BIRTH'] = abs(data_app_train['DAYS_BIRTH'])
+
+
+## Distribution de CREDIT_INCOME_PERCENT
+data_app_train['CREDIT_INCOME_PERCENT'] = data_app_train['AMT_CREDIT'] / data_app_train['AMT_INCOME_TOTAL']
+data_app_train['ANNUITY_INCOME_PERCENT'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_INCOME_TOTAL']
+data_app_train['CREDIT_TERM'] = data_app_train['AMT_ANNUITY'] / data_app_train['AMT_CREDIT']
+data_app_train['DAYS_EMPLOYED_PERCENT'] = data_app_train['DAYS_EMPLOYED'] / data_app_train['DAYS_BIRTH']
 
 
 
-if choice == "Général" and data_file is not None:
+if choice == "Général":
 
 
-        st.subheader("Capacité de remboursement de crédit de la population")
-        fig = plt.figure(figsize=(12, 20))
+        df = pd.read_csv('application_train2.csv')
+        df['AGE'] = (df['DAYS_BIRTH'] / -365).astype(int)
 
-        for i, feature in enumerate(['CREDIT_INCOME_PERCENT', 'ANNUITY_INCOME_PERCENT', 'CREDIT_TERM', 'DAYS_EMPLOYED_PERCENT']):
+        st.subheader("Distribution de nos deux populations selon l'âge des clients:")
+        st.write("Population 1: Target 1 => crédit accordé")
+        st.write("Population 2: Target 2 => crédit refusé")
+        fig = plt.figure(figsize=(15, 5))
 
-            # create a new subplot for each source
-            plt.subplot(4, 1, i + 1)
-            # plot repaid loans
-            sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 0, feature], label = 'target == 0')
-            # plot loans that were not repaid
-            sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 1, feature], label = 'target == 1')
-            # plt.scatter(data.loc[idx][feature])
-            # Label the plots
-            plt.title('Distribution de %s en fonction de la Target' % feature)
-            plt.xlabel('%s' % feature); plt.ylabel('Density')
-            plt.legend()
-
-        plt.tight_layout(h_pad = 2.5)
+        sns.violinplot(data=df, x="NAME_INCOME_TYPE", y="AGE", hue="TARGET",
+                               split=True, inner="quart", linewidth=1)
         st.pyplot(fig)
 
-        ############### Plots classiques
         # Distribution de l'age en fonction des remboursements des crédits
         fig = plt.figure(figsize=(10, 4))
         age_data = data_app_train[['TARGET', 'DAYS_BIRTH']]
@@ -181,7 +168,56 @@ if choice == "Général" and data_file is not None:
         plt.title('Echec de remboursement par groupe d'' âge')
         st.pyplot(fig)
 
-elif choice == "Profil Client" and data_file is not None:
+        # st.subheader("Distribution de la population selon la source de revenue:")
+        # fig = plt.figure(figsize=(15, 5))
+        # sns.displot(
+        #     data=df,
+        #     x="AMT_INCOME_TOTAL", hue="NAME_INCOME_TYPE",
+        #     kind="kde",
+        #     multiple="fill", clip=(0, None),
+        #     palette="ch:rot=-.25,hue=1,light=.75",
+        #     log_scale=True,
+        # )
+        # st.pyplot(fig)
+
+        st.subheader("Distribution de la population selon leur revenue total et leur diplôme académique:")
+        fig = plt.figure(figsize=(15, 5))
+
+        splot = sns.boxenplot(x="NAME_EDUCATION_TYPE", y="AMT_INCOME_TOTAL",
+              color="b",
+              scale="linear", data=df)
+
+        splot.set(yscale="log")#, yscale='log')
+        st.pyplot(fig)
+
+        ############### Plots classiques
+
+        st.subheader("Capacité de remboursement de crédit de la population")
+        fig = plt.figure(figsize=(12, 20))
+
+        for i, feature in enumerate(['CREDIT_INCOME_PERCENT', 'ANNUITY_INCOME_PERCENT', 'CREDIT_TERM', 'DAYS_EMPLOYED_PERCENT']):
+
+            # create a new subplot for each source
+            plt.subplot(4, 1, i + 1)
+            # plot repaid loans
+            sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 0, feature], label = 'target = 0')
+            # plot loans that were not repaid
+            sns.kdeplot(data_app_train.loc[data_app_train['TARGET'] == 1, feature], label = 'target = 1')
+            # plt.scatter(data.loc[idx][feature])
+            # Label the plots
+            plt.title('Distribution de %s' % feature)
+            plt.xlabel('%s' % feature)
+            plt.ylabel('Densité')
+            plt.legend()
+
+        plt.tight_layout(h_pad = 2.5)
+        st.pyplot(fig)
+
+
+        plt.figure(figsize=(10, 4))
+
+
+elif choice == "Profil Client":
 
         client_id = df['SK_ID_CURR']
         choice = st.sidebar.selectbox("Client ID",client_id)
@@ -190,7 +226,7 @@ elif choice == "Profil Client" and data_file is not None:
         feature_choice = st.sidebar.selectbox("Features",features)
 
         ## Prédiction
-        models = ["RandomForest.pkl", "XGBOOST.pkl", "Regression_Logisitique.pkl"]
+        models = ["RandomForest.pkl"]
         model_choice = st.sidebar.selectbox("Modèle",models)
         model = pickle.load(open(model_choice, 'rb'))
         df_client = pd.DataFrame(df.loc[idx].values.reshape(1, len(df.columns)), columns=df.columns)
@@ -241,43 +277,94 @@ elif choice == "Profil Client" and data_file is not None:
         fig.update_layout(paper_bgcolor = "lavender", font = {'color': "darkblue", 'family': "Arial"})
         # fig.show()
         st.plotly_chart(fig)
-        st.subheader("Probabilité de remboursement du client: %.1f%%"%(results['TARGET_probability'][0]*1e2))
 
+        st.write("Probabilité de remboursement du client: %.1f%%"%(results['TARGET_probability'][0]*1e2))
 
         fig = plt.figure(figsize=(10, 4))
 
         idx_target1 = data_app_train[data_app_train['TARGET']==0].index
         idx_target2 = data_app_train[data_app_train['TARGET']==1].index
+        # Client population
         plt.scatter(abs(data_app_train.loc[idx_target1, 'DAYS_BIRTH']/365), data_app_train.loc[idx_target1, feature_choice], label='TARGET = 0')
         plt.scatter(abs(data_app_train.loc[idx_target2, 'DAYS_BIRTH']/365), data_app_train.loc[idx_target2, feature_choice], label='TARGET = 1')
-        plt.scatter(abs(data_app_train.loc[idx, 'DAYS_BIRTH']/365), data_app_train.loc[idx, feature_choice], color='k', label='Client ID:%d'%int(idx.values))
+        # Client_0
+        plt.scatter(abs(data_app_train.loc[idx, 'DAYS_BIRTH']/365), data_app_train.loc[idx, feature_choice], color='r',
+             s=200, marker = '^', label='Client ID: %d'%int(choice))
+        # 10 nearest_neighbor of client_0
         plt.scatter(abs(data_app_train.iloc[idx_nearest_neighbor]['DAYS_BIRTH']/365), data_app_train.iloc[idx_nearest_neighbor][feature_choice], color='m',
         label='Clients avec un profil similaire')
         plt.legend()
         st.pyplot(fig)
 
-        # if model_choice == "RandomForest.pkl" or model_choice == "XGBOOST.pkl":
+        st.subheader("Densité de probabilité selon la population ciblée (Taget 0 - 1):")
+        st.write("Position du client sélectioné par rapport à ses 10 plus proches voisins parmi l'ensemble des clients présent dans notre base de données")
 
-            ## Shaply model
+        figure, axes = plt.subplots(1, 2, figsize=(12,6))
+        TARGET = [0, 1]
+        COLORS = ['C0', 'C1']
+        i = 0
 
-            # def st_shap(plot, height=None):
-            #     shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
-            #     components.html(shap_html, height=height)
+        for T in TARGET:
+
+            x, y = data_app_train[data_app_train['TARGET']==T]['AMT_INCOME_TOTAL'], data_app_train[data_app_train['TARGET']==T]['AMT_CREDIT']
+            splot = sns.scatterplot(ax=axes[T], x=x, y=y, s=50, color=COLORS[i], label='Target %d'%T)
+            splot.set(xscale="log", yscale='log')
+            # Pixels de couleurs
+            # sns.histplot(ax=axes[T], x=x, y=y, bins=50, pthresh=.1, cmap="mako", log_scale=True)
+            # Contours de disitribution gaussienne à 2D
+            sns.kdeplot(ax=axes[T], x=x, y=y, levels=5, color="r", linewidths=2, log_scale=True)
+
+            ## client_0
+            x, y = data_app_train.iloc[idx]['AMT_INCOME_TOTAL'], data_app_train.iloc[idx]['AMT_CREDIT']
+            splot = sns.scatterplot(ax=axes[T], x=x, y=y, s=200, color='r',
+                marker = '^', label='Client ID: %d'%int(choice))
+            splot.set(xscale="log", yscale='log')
+
+            ## nearest_neighbors
+            x, y = data_app_train.iloc[idx_nearest_neighbor]['AMT_INCOME_TOTAL'], data_app_train.iloc[idx_nearest_neighbor]['AMT_CREDIT']
+            splot = sns.scatterplot(ax=axes[T], x=x, y=y, s=70, color='m')
+            splot.set(xscale="log", yscale='log')
+
+            i+=1
+
+        st.pyplot(figure)
 
 
-            ## compute SHAP values
-            # explainer = shap.Explainer(model, df)
-            # shap_values = explainer(df)
-            # st_shap(shap.plots.waterfall(shap_values[0]), height=300)
-            # st_shap(shap.plots.beeswarm(shap_values), height=300)
-            # fig = plt.figure(figsize=(10, 4))
-            # shap.initjs()
-            # explainer = shap.TreeExplainer(model)
-            # shap_values = explainer.shap_values(df)
-            # i = np.where((df.index.values == idx.values)==True)
-            # st.write(df.loc[idx])
-            # st.write(shap_values[i])
-            # st.write(explainer.expected_value)
-            # shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns)
-            # st_shap(shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns))
-            # st.pyplot(fig)
+        ## Features importances
+        st.subheader("Merci de trouver ci-dessous les 10 features les plus corrélées avec la capacité de remboursement d'un client")
+        fig = plt.figure(figsize=(10, 4))
+
+        feature_importance_values_RF = model.feature_importances_
+        print(len(data_app_train.columns[:-1]), len(feature_importance_values_RF))
+        feature_importances_RF = pd.DataFrame({'feature': data_app_train.columns[:len(feature_importance_values_RF)], 'importance': feature_importance_values_RF})
+        feature_importances_RF = feature_importances_RF.sort_values(by='importance', ascending=False)[:10]
+        ax = sns.barplot(data = feature_importances_RF, x = 'feature', y = 'importance')
+        _ = ax.set_xticklabels(labels= feature_importances_RF['feature'], rotation=90) # incliner ou tourner le nom des labels sur l'axe x
+        st.pyplot(fig)
+
+        ## Shaply model
+
+        # def st_shap(plot, height=None):
+        #     shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
+        #     components.html(shap_html, height=height)
+
+
+        ## compute SHAP values
+        # explainer = shap.Explainer(model, df)
+        # shap_values = explainer(df, check_additivity=False)
+        #
+        # st_shap(shap.summary_plot(shap_values, df))
+        # st_shap(shap.plots.waterfall(shap_values[0]), height=300)
+        # st_shap(shap.plots.beeswarm(shap_values), height=300)
+
+        # fig = plt.figure(figsize=(10, 4))
+        # shap.initjs()
+        # explainer = shap.TreeExplainer(model)
+        # shap_values = explainer.shap_values(df)
+        # i = np.where((df.index.values == idx.values)==True)
+        # st.write(df.loc[idx])
+        # st.write(shap_values[i])
+        # st.write(explainer.expected_value)
+        # shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns)
+        # st_shap(shap.force_plot(explainer.expected_value, shap_values[i], features=df.loc[idx], feature_names=df.columns))
+        # st.pyplot(fig)
