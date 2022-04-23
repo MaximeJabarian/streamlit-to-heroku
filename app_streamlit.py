@@ -105,7 +105,7 @@ menu = ["Général", "Profil Client"]
 choice = st.sidebar.selectbox("Menu",menu)
 
 
-df = pd.read_csv('train_init3.csv', sep=';').drop(columns=['Unnamed: 0'])
+df = pd.read_csv('train_init3.csv').drop(columns=['Unnamed: 0'])
 # df = df.set_index('Unnamed: 0')
 df_cols = df.columns
 clients_ids = df['SK_ID_CURR'].astype(int)
@@ -141,15 +141,15 @@ data_app_train['DAYS_EMPLOYED_PERCENT'] = data_app_train['DAYS_EMPLOYED'] / data
 if choice == "Général":
 
 
-        df = pd.read_csv('application_train2.csv')
-        df['AGE'] = (df['DAYS_BIRTH'] / -365).astype(int)
+        df_train = pd.read_csv('application_train2.csv')
+        df_train['AGE'] = (df_train['DAYS_BIRTH'] / -365).astype(int)
 
         st.subheader("Distribution de nos deux populations selon l'âge des clients:")
-        st.write("Population 1: Target 1 => crédit accordé")
-        st.write("Population 2: Target 2 => crédit refusé")
+        st.write("Population 1: Target 0 => crédit refusé")
+        st.write("Population 2: Target 1 => crédit accordé")
         fig = plt.figure(figsize=(15, 5))
 
-        sns.violinplot(data=df, x="NAME_INCOME_TYPE", y="AGE", hue="TARGET",
+        sns.violinplot(data=df_train, x="NAME_INCOME_TYPE", y="AGE", hue="TARGET",
                                split=True, inner="quart", linewidth=1)
         st.pyplot(fig)
 
@@ -185,7 +185,7 @@ if choice == "Général":
 
         splot = sns.boxenplot(x="NAME_EDUCATION_TYPE", y="AMT_INCOME_TOTAL",
               color="b",
-              scale="linear", data=df)
+              scale="linear", data=df_train)
 
         splot.set(yscale="log")#, yscale='log')
         st.pyplot(fig)

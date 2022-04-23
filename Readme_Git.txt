@@ -30,3 +30,6 @@ git checkout main
 git reset --hard upstream/main
 git push --force
 git push --set-upstream origin main
+
+POUR ANNULER UN PUSH DE FICHIER TROP LOURD:
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch file" --prune-empty --tag-name-filter cat -- --all
