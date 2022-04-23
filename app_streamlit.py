@@ -13,7 +13,7 @@ import os
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from bokeh.plotting import figure
 from urllib.error import URLError
-from streamlit_shap import st_shap
+# from streamlit_shap import st_shap
 
 
 def fetch(session, url):
